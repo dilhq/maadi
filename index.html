@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Maadi Labs — Coming Soon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Inter:wght@400;500;600&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --indigo: #1B1A47;
+    --pink: #FC1F8F;
+    --bg: #FFFBFD;
+    --muted: #6f6d90;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    background: var(--bg);
+  }
+
+  body{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .stage{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100dvh;
+    width: 100%;
+    padding: 4vh 6vw;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  /* ---------- Layer 0: scattered background shapes (parallax only) ---------- */
+
+  .deco{
+    position: absolute;
+    pointer-events: none;
+    opacity: 0;
+    animation: decoFade 1s ease-out forwards;
+  }
+  .deco svg{ display: block; width: 100%; height: 100%; }
+
+  .deco-star{
+    top: 12%;
+    left: 9%;
+    width: clamp(26px, 4.5vw, 46px);
+    height: clamp(26px, 4.5vw, 46px);
+    animation-delay: 0.1s;
+  }
+  .deco-scribble{
+    bottom: 14%;
+    left: 7%;
+    width: clamp(50px, 8vw, 90px);
+    height: clamp(24px, 4vw, 40px);
+    animation-delay: 0.25s;
+  }
+  .deco-blob{
+    top: 16%;
+    right: 10%;
+    width: clamp(20px, 3.6vw, 34px);
+    height: clamp(20px, 3.6vw, 34px);
+    animation-delay: 0.4s;
+  }
+
+  @keyframes decoFade{
+    from{ opacity: 0; transform: scale(0.7); }
+    to  { opacity: 1; transform: scale(1); }
+  }
+
+  /* ---------- Layer 1: parallax wrappers (JS translate only) ---------- */
+
+  .parallax{
+    will-change: transform;
+  }
+
+  /* ---------- Layer 2: mascot (float animation + static tilt) ---------- */
+
+  .mascot-float{
+    animation: float 5.5s ease-in-out infinite;
+  }
+
+  .mascot-wrap{
+    position: relative;
+    width: clamp(160px, 25vw, 300px);
+    margin-bottom: clamp(10px, 2vh, 20px);
+    transform: rotate(-3deg);
+  }
+
+  svg#mascot{
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 20px 34px rgba(27, 26, 71, 0.14));
+  }
+
+  @keyframes float{
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-8px); }
+  }
+
+  .badge{
+    position: absolute;
+    top: -4%;
+    right: -14%;
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: clamp(1.1rem, 3.2vw, 1.6rem);
+    color: var(--pink);
+    transform: rotate(9deg);
+    pointer-events: none;
+    white-space: nowrap;
+    opacity: 0;
+    animation: badgePop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    animation-delay: 0.35s;
+  }
+
+  @keyframes badgePop{
+    from { opacity: 0; transform: rotate(9deg) scale(0.4); }
+    to   { opacity: 1; transform: rotate(9deg) scale(1); }
+  }
+
+  /* ---------- Layer 2/3: text (static collage offsets + staggered entrance) ---------- */
+
+  .text-block{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .headline-stack{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.02em;
+  }
+
+  .line{
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 0.98;
+    margin: 0;
+    opacity: 0;
+    animation: lineIn 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  .line-1{
+    font-size: clamp(1.6rem, 6.2vw, 2.9rem);
+    color: var(--indigo);
+    --rot: -3deg;
+    --shift: -5%;
+    animation-delay: 0.45s;
+  }
+
+  .line-2{
+    position: relative;
+    display: inline-block;
+    font-size: clamp(2rem, 8vw, 3.8rem);
+    color: var(--pink);
+    margin-top: 0.1em;
+    padding-bottom: 0.16em;
+    --rot: 3deg;
+    --shift: 4%;
+    animation-delay: 0.6s;
+  }
+
+  @keyframes lineIn{
+    from { opacity: 0; transform: translateY(22px) translateX(var(--shift)) rotate(var(--rot)) scale(0.9); }
+    to   { opacity: 1; transform: translateY(0)     translateX(var(--shift)) rotate(var(--rot)) scale(1); }
+  }
+
+  .squiggle{
+    position: absolute;
+    left: 4%;
+    bottom: 0;
+    width: 92%;
+    height: auto;
+  }
+
+  .loading-dots span{
+    display: inline-block;
+    animation: pulseDot 1.4s infinite;
+  }
+  .loading-dots span:nth-child(2){ animation-delay: 0.2s; }
+  .loading-dots span:nth-child(3){ animation-delay: 0.4s; }
+
+  @keyframes pulseDot{
+    0%, 80%, 100% { opacity: 0.15; }
+    40%           { opacity: 1; }
+  }
+
+  .subtext{
+    margin: clamp(14px, 3vh, 22px) 0 0;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: clamp(0.8rem, 1.8vw, 0.95rem);
+    letter-spacing: 0.02em;
+    color: var(--muted);
+    opacity: 0;
+    transform: translateX(-3%);
+    animation: subIn 0.6s ease-out forwards;
+    animation-delay: 0.8s;
+  }
+  .subtext .dot{ color: var(--pink); margin: 0 0.6ch; }
+
+  @keyframes subIn{
+    from { opacity: 0; transform: translateX(-3%) translateY(10px); }
+    to   { opacity: 1; transform: translateX(-3%) translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .mascot-float{ animation: none; }
+    .deco, .badge, .line, .subtext{ animation: none; opacity: 1; }
+    .loading-dots span{ animation: none; opacity: 1; }
+    .pupil{ transition: none; }
+    .parallax{ transform: none !important; }
+  }
+
+  @media (max-height: 420px){
+    .mascot-wrap{ margin-bottom: 8px; }
+    svg#mascot{ width: clamp(100px, 16vw, 190px); }
+    .subtext{ margin-top: 8px; }
+  }
+</style>
+</head>
+<body>
+
+  <main class="stage" id="stage">
+
+    <div class="deco deco-star" aria-hidden="true">
+      <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 2 L24 15 L38 15 L27 23 L31 37 L20 28 L9 37 L13 23 L2 15 L16 15 Z" fill="#1B1A47" opacity="0.16"/>
+      </svg>
+    </div>
+    <div class="deco deco-scribble" aria-hidden="true">
+      <svg viewBox="0 0 90 40" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 30 Q 18 6 32 22 T 60 18 T 86 26" fill="none" stroke="#FC1F8F" stroke-width="6" stroke-linecap="round" opacity="0.22"/>
+      </svg>
+    </div>
+    <div class="deco deco-blob" aria-hidden="true">
+      <svg viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="17" cy="17" r="17" fill="#FC1F8F" opacity="0.18"/>
+      </svg>
+    </div>
+
+    <div class="parallax" data-depth="0.55">
+      <div class="mascot-float">
+        <div class="mascot-wrap">
+          <svg id="mascot" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Maadi Labs mascot">
+            <g transform="translate(0.000000,600.000000) scale(0.100000,-0.100000)" fill="#FC1F8F" stroke="none">
+              <path d="M4275 4732 c-72 -35 -99 -76 -289 -444 -69 -134 -96 -197 -96 -223 0
+              -40 22 -100 48 -128 70 -78 226 -75 298 5 35 38 314 540 323 580 17 72 -17
+              153 -80 195 -55 36 -145 42 -204 15z"/>
+              <path d="M4985 4291 c-49 -12 -74 -29 -208 -139 -235 -193 -348 -293 -367
+              -325 -28 -45 -27 -127 2 -179 50 -89 170 -119 258 -65 25 14 151 106 280 204
+              260 197 280 219 280 309 0 126 -124 225 -245 195z"/>
+              <path d="M1958 3850 c-318 -39 -625 -280 -866 -680 -231 -382 -350 -816 -313
+              -1141 39 -333 219 -569 511 -669 50 -17 97 -23 200 -27 165 -6 267 14 406 82
+              164 79 281 179 507 432 174 195 287 272 411 281 88 7 156 -13 240 -69 74 -49
+              113 -90 267 -279 144 -176 264 -278 416 -354 124 -62 193 -78 353 -83 179 -6
+              276 13 420 84 80 40 109 61 185 137 74 74 99 107 132 176 56 114 73 183 80
+              320 15 318 -136 833 -344 1170 -117 190 -294 387 -426 474 -232 152 -487 190
+              -718 106 -154 -56 -272 -155 -386 -326 -100 -148 -161 -186 -243 -149 -52 23
+              -87 63 -150 170 -99 168 -246 288 -401 329 -73 19 -200 26 -281 16z m676 -844
+              c63 -48 66 -60 66 -301 0 -237 -3 -250 -60 -299 -81 -68 -208 -49 -261 38 -17
+              28 -19 53 -19 257 0 219 1 227 23 260 55 82 175 104 251 45z m634 7 c15 -11
+              37 -35 50 -53 21 -32 22 -41 22 -252 0 -198 -2 -222 -20 -257 -34 -68 -123
+              -105 -195 -81 -52 17 -103 65 -115 108 -16 58 -13 416 4 456 16 39 50 73 91
+              92 41 20 129 13 163 -13z"/>
+              <path d="M5205 3565 c-60 -14 -177 -39 -259 -56 -126 -28 -154 -37 -183 -62
+              -46 -40 -63 -77 -63 -134 0 -95 75 -172 168 -173 64 0 518 78 550 94 31 16 74
+              61 91 93 18 35 13 119 -9 163 -23 45 -85 85 -145 93 -24 4 -83 -4 -150 -18z"/>
+            </g>
+
+            <g class="pupil pupil-a" data-cx="253" data-cy="329.4">
+              <rect x="243" y="309.4" width="20" height="40" rx="10" fill="#1B1A47"/>
+            </g>
+            <g class="pupil pupil-b" data-cx="317.5" data-cy="330.2">
+              <rect x="307.5" y="310.2" width="20" height="40" rx="10" fill="#1B1A47"/>
+            </g>
+          </svg>
+          <span class="badge">Game on!</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="parallax" data-depth="0.28">
+      <div class="text-block">
+        <div class="headline-stack">
+          <h1 class="line line-1">Big fun,</h1>
+          <span class="line line-2">
+            loading<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span>
+            <svg class="squiggle" viewBox="0 0 200 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M2 12 Q 20 2 38 12 T 74 12 T 110 12 T 146 12 T 182 12" fill="none" stroke="#FC1F8F" stroke-width="6" stroke-linecap="round"/>
+            </svg>
+          </span>
+        </div>
+        <p class="subtext">Small Games<span class="dot">•</span>Big Moments<span class="dot">•</span>Coming Soon</p>
+      </div>
+    </div>
+
+  </main>
+
+<script>
+  (function(){
+    var svg = document.getElementById('mascot');
+    var pupils = document.querySelectorAll('.pupil');
+    var travel = 9; // how far the pupils shift, in the SVG's own coordinate units
+
+    function updatePupils(clientX, clientY){
+      var rect = svg.getBoundingClientRect();
+      var vb = svg.viewBox.baseVal;
+      var scaleX = vb.width / rect.width;
+      var scaleY = vb.height / rect.height;
+      var px = (clientX - rect.left) * scaleX;
+      var py = (clientY - rect.top) * scaleY;
+
+      pupils.forEach(function(pupil){
+        var cx = parseFloat(pupil.dataset.cx);
+        var cy = parseFloat(pupil.dataset.cy);
+        var angle = Math.atan2(py - cy, px - cx);
+
+        var dx = Math.cos(angle) * travel;
+        var dy = Math.sin(angle) * travel;
+
+        pupil.setAttribute('transform', 'translate(' + dx.toFixed(2) + ',' + dy.toFixed(2) + ')');
+      });
+    }
+
+    document.addEventListener('pointermove', function(e){
+      updatePupils(e.clientX, e.clientY);
+    });
+
+    document.addEventListener('touchmove', function(e){
+      if (e.touches && e.touches[0]){
+        updatePupils(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+  })();
+
+  // ---- Layered parallax: moves only the outer ".parallax" / ".deco" wrappers ----
+  (function(){
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) return;
+
+    var layers = Array.prototype.slice.call(document.querySelectorAll('.parallax, .deco'));
+    var targets = layers.map(function(el){
+      var depth = parseFloat(el.dataset.depth || '0.15');
+      return { el: el, depth: depth, curX: 0, curY: 0, goalX: 0, goalY: 0 };
+    });
+
+    var maxShiftX = 22; // px, at depth = 1
+    var maxShiftY = 14; // px, at depth = 1
+
+    function setGoal(clientX, clientY){
+      var nx = (clientX / window.innerWidth - 0.5) * 2;   // -1..1
+      var ny = (clientY / window.innerHeight - 0.5) * 2;  // -1..1
+      targets.forEach(function(t){
+        t.goalX = nx * maxShiftX * t.depth;
+        t.goalY = ny * maxShiftY * t.depth;
+      });
+    }
+
+    function tick(){
+      targets.forEach(function(t){
+        t.curX += (t.goalX - t.curX) * 0.08;
+        t.curY += (t.goalY - t.curY) * 0.08;
+        t.el.style.transform = 'translate3d(' + t.curX.toFixed(2) + 'px,' + t.curY.toFixed(2) + 'px,0)';
+      });
+      requestAnimationFrame(tick);
+    }
+
+    document.addEventListener('pointermove', function(e){
+      setGoal(e.clientX, e.clientY);
+    });
+
+    document.addEventListener('touchmove', function(e){
+      if (e.touches && e.touches[0]){
+        setGoal(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+
+    requestAnimationFrame(tick);
+  })();
+</script>
+
+</body>
+</html>
