@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Purrfect Sort · Maadi Labs</title>
+<meta name="description" content="Sort adorable animals, solve colorful puzzles, and discover your new furry friends in Purrfect Sort.">
+<style>
+:root{--navy:#1B1A47;--pink:#FC1F8F;--cream:#FFF9FC;--ink:#292744;--muted:#77758A;--line:#ECE9F1;--white:#fff}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.7}
+a{text-decoration:none;color:inherit}.page{width:min(1080px,calc(100% - 40px));margin:auto}
+nav{height:84px;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:9px;font-weight:850;color:var(--navy);letter-spacing:-.04em}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--pink);box-shadow:0 0 0 5px #fc1f8f14}
+.studio{font-size:13px;color:var(--muted)}
+.hero{min-height:calc(100vh - 84px);display:grid;grid-template-columns:1fr .78fr;align-items:center;gap:70px;padding:45px 0 90px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;color:var(--pink);font-weight:750;font-size:13px;margin-bottom:19px}
+.eyebrow i{width:6px;height:6px;border-radius:50%;background:var(--pink);animation:pulse 2s infinite}
+h1{margin:0;color:var(--navy);font-size:clamp(58px,8vw,90px);line-height:.9;letter-spacing:-.075em}
+h1 em{color:var(--pink);font-style:normal}
+.hero-copy{max-width:540px;margin:25px 0 28px;color:var(--muted);font-size:18px;line-height:1.65}
+.story{max-width:535px;color:#55536A;font-size:15px;margin:0 0 30px}
+.story strong{color:var(--navy)}
+.cta{display:inline-flex;align-items:center;gap:10px;background:var(--navy);color:#fff;padding:14px 19px;border-radius:15px;font-size:14px;font-weight:750;box-shadow:0 10px 28px #1b1a471c;transition:.2s ease}
+.cta:hover{transform:translateY(-3px);box-shadow:0 14px 32px #1b1a4726}
+.cta span{transition:transform .2s}.cta:hover span{transform:translateX(3px)}
+.logo-wrap{position:relative;display:flex;justify-content:center;align-items:center}
+.logo-wrap:before{content:"";position:absolute;width:340px;height:340px;border-radius:50%;background:#fc1f8f0d;animation:float 5s ease-in-out infinite}
+.logo-card{position:relative;width:min(360px,75vw);aspect-ratio:1;border-radius:38px;background:#fff;padding:22px;box-shadow:0 24px 70px #1b1a4714;border:1px solid #fff;transform:rotate(2deg);animation:cardFloat 5s ease-in-out infinite;transition:.35s cubic-bezier(.2,.8,.2,1)}
+.logo-card:hover{transform:rotate(0) translateY(-7px) scale(1.015);box-shadow:0 30px 80px #1b1a4720}
+.logo-card img{display:block;width:100%;height:100%;object-fit:cover;border-radius:25px}
+.hint{position:absolute;right:0;bottom:22px;background:#fff;border:1px solid var(--line);padding:8px 11px;border-radius:12px;color:var(--muted);font-size:11px;box-shadow:0 10px 30px #1b1a470b;animation:hint 3.5s ease-in-out infinite}
+.section{border-top:1px solid var(--line);padding:70px 0}
+.section-inner{max-width:720px}
+.kicker{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--pink);margin-bottom:10px}
+h2{margin:0 0 18px;color:var(--navy);font-size:clamp(32px,5vw,48px);line-height:1;letter-spacing:-.055em}
+.section p{margin:0 0 16px;color:#5d5b70;font-size:16px}
+.pills{display:flex;gap:9px;flex-wrap:wrap;margin-top:25px}
+.pill{padding:8px 12px;background:#fff;border:1px solid var(--line);border-radius:999px;font-size:12px;color:var(--muted);transition:.2s}
+.pill:hover{transform:translateY(-2px);border-color:#ddd7e5}
+.download{text-align:center;padding:85px 0 75px}
+.download h2{margin-bottom:13px}
+.download p{color:var(--muted);margin:0 auto 25px;max-width:500px}
+.play{display:inline-flex;align-items:center;gap:10px;background:var(--pink);color:#fff;padding:14px 20px;border-radius:15px;font-size:14px;font-weight:800;box-shadow:0 10px 28px #fc1f8f26;transition:.2s}
+.play:hover{transform:translateY(-3px);box-shadow:0 15px 34px #fc1f8f30}
+.play small{display:block;font-size:10px;font-weight:600;opacity:.8;text-align:left;line-height:1}
+footer{border-top:1px solid var(--line);padding:24px 0 34px;display:flex;justify-content:space-between;color:var(--muted);font-size:13px}
+@keyframes float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-10px) scale(1.025)}}
+@keyframes cardFloat{0%,100%{transform:rotate(2deg) translateY(0)}50%{transform:rotate(1deg) translateY(-8px)}}
+@keyframes hint{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.55}}
+@media(max-width:760px){
+.page{width:min(100% - 28px,540px)}nav{height:70px}.hero{grid-template-columns:1fr;gap:42px;min-height:auto;padding:50px 0 70px;text-align:center}.logo-wrap{order:-1}.hero-copy,.story{margin-left:auto;margin-right:auto;font-size:16px}.logo-card{width:min(310px,78vw);padding:16px;border-radius:30px}.logo-card img{border-radius:20px}.logo-wrap:before{width:275px;height:275px}.hint{right:4%;bottom:5px}.pills{justify-content:center}.section{text-align:center}.download{padding:65px 0}.studio{font-size:12px}footer{flex-direction:column;gap:5px;text-align:center}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="page">
+<nav>
+<a class="brand" href="#"><span class="dot"></span>Purrfect Sort</a>
+<span class="studio">by Maadi Labs</span>
+</nav>
+
+<main>
+<section class="hero">
+<div>
+<div class="eyebrow"><i></i>A little sorting. A lot of cute.</div>
+<h1>Sort it.<br><em>Purrfectly.</em></h1>
+<p class="hero-copy">A cozy little puzzle game where fuzzy friends, colorful tubes, and satisfying matches come together.</p>
+<p class="story">
+They've all arrived, but nobody knows where they belong. <strong>Your job is simple:</strong>
+sort the furry crew by color, make the right matches, and help everyone find their place.
+It starts easy. Then the shelves fill up, the choices get trickier, and suddenly you're thinking three moves ahead.
+</p>
+<a class="cta" href="https://play.google.com/store" target="_blank" rel="noopener">Get it on Google Play <span>→</span></a>
+</div>
+
+<div class="logo-wrap">
+<div class="logo-card"><img src="purrrfectapplogo.png" alt="Purrfect Sort"></div>
+<div class="hint">tiny breaks welcome 🐾</div>
+</div>
+</section>
+
+<section class="section">
+<div class="section-inner">
+<div class="kicker">How it works</div>
+<h2>Easy to learn.<br>Surprisingly tricky.</h2>
+<p>Pick a furry friend. Move it into the right tube. Build matching groups and clear them out.</p>
+<p>With every level, there are more colors, more friends, and less room for mistakes. The rules stay simple. Your strategy doesn't.</p>
+<div class="pills">
+<span class="pill">Cute animals</span>
+<span class="pill">Color sorting</span>
+<span class="pill">Relaxing puzzles</span>
+<span class="pill">Offline play</span>
+</div>
+</div>
+</section>
+
+<section class="download">
+<div class="kicker">Ready when you are</div>
+<h2>Give your brain<br>a little purr break.</h2>
+<p>Download Purrfect Sort and start sorting your furry crew.</p>
+<a class="play" href="https://play.google.com/store" target="_blank" rel="noopener">
+<span>▶</span><small>GET IT ON<br><b>Google Play</b></small>
+</a>
+</section>
+</main>
+
+<footer>
+<span>© 2026 Maadi Labs</span>
+<span>Purrfect Sort</span>
+</footer>
+</div>
+</body>
+</html>
