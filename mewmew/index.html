@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mew Mew — A purrfect logic puzzle | Maadi Labs</title>
+<meta name="description" content="Mew Mew is a cute logic puzzle: find every kitty a box, follow the numbers, and keep the cats apart. A Maadi Labs game.">
+<meta name="theme-color" content="#FBF8FF">
+<link rel="canonical" href="https://maadilabs.com/mewmew/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://maadilabs.com/mewmew/">
+<meta property="og:title" content="Mew Mew — A purrfect logic puzzle">
+<meta property="og:description" content="Find every kitty a box. A cute logic puzzle by Maadi Labs.">
+<!-- Share image: banner.png sits next to this file. Adjust the path if you host it elsewhere. -->
+<meta property="og:image" content="https://maadilabs.com/mewmew/banner.png">
+<link rel="icon" type="image/png" href="mewmew-icon.png">
+<link rel="apple-touch-icon" href="mewmew-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js')</script>
+<style>
+/* ===== TOKENS ===== */
+:root{
+  --ink:#1B1A47; --muted:#77758D; --bg:#FBF8FF; --white:#fff;
+  --lav:#EEE6FF; --lav2:#DCCBFB; --purple:#5B35A8; --orange:#E3A455; --yellow:#FFC933; --pink:#FC1F8F;
+  --line:rgba(27,26,71,.09); --pad:clamp(20px,5vw,64px);
+  --spring:cubic-bezier(.34,1.56,.64,1);
+  --head:'Manrope',system-ui,sans-serif; --body:'DM Sans',system-ui,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);line-height:1.55;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+img,svg{display:block;max-width:100%}
+h1,h2,h3,p{margin:0}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--purple);outline-offset:3px;border-radius:10px}
+
+/* ===== BUTTON ===== */
+.btn{display:inline-flex;align-items:center;gap:.65em;font:700 1rem/1 var(--head);padding:1.05em 1.7em;border-radius:999px;background:var(--ink);color:var(--white);text-decoration:none;border:0;cursor:pointer;transition:background .2s,transform .3s var(--spring)}
+.btn svg{width:1.15em;height:1.15em;flex:none}
+.btn:hover{background:var(--purple);transform:translateY(-2px)}
+.btn[aria-disabled="true"]{cursor:default}
+
+/* ===== HERO ===== */
+.hero{position:relative;min-height:max(88svh,620px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:96px var(--pad) 84px;overflow:hidden;background:radial-gradient(60% 55% at 50% 30%,var(--lav) 0,rgba(238,230,255,0) 72%)}
+.from{position:absolute;top:clamp(20px,3.5vw,34px);left:var(--pad);display:flex;align-items:baseline;gap:.7em;text-decoration:none}
+.from b{font:800 clamp(1.3rem,2vw,1.6rem)/1 var(--head);letter-spacing:-.03em}
+.from b i{font-style:normal;color:var(--pink)}
+.from em{font:600 .72rem/1 var(--head);font-style:normal;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+.cat{position:relative;z-index:2;width:clamp(170px,34vw,280px);aspect-ratio:1;border:0;background:none;padding:0;cursor:pointer;perspective:800px;animation:bob 5.5s ease-in-out infinite;-webkit-tap-highlight-color:transparent}
+.cat.hop{animation:hop .6s ease}
+.cat-in{width:100%;height:100%;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .25s ease-out}
+.cat img{width:100%;height:100%;object-fit:cover;border-radius:22.5%;box-shadow:0 34px 50px -22px rgba(91,53,168,.5)}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes hop{0%{transform:translateY(0) scale(1,1)}25%{transform:translateY(0) scale(1.07,.92)}55%{transform:translateY(-34px) scale(.96,1.06)}80%{transform:translateY(0) scale(1.05,.95)}100%{transform:translateY(0) scale(1)}}
+.spark{position:absolute;z-index:3;right:-10%;top:-12%;width:34%;pointer-events:none;animation:spark 2.6s ease-in-out infinite}
+.cat.hop .spark{animation:burst .6s ease}
+@keyframes spark{0%,100%{transform:scale(.92);opacity:.85}50%{transform:scale(1.06);opacity:1}}
+@keyframes burst{50%{transform:scale(1.35)}}
+.bubble{position:absolute;z-index:4;right:-20%;top:24%;white-space:nowrap;font:800 .8rem/1 var(--head);color:var(--purple);background:var(--white);border:1px solid var(--lav2);padding:.7em 1.05em;border-radius:999px;box-shadow:0 8px 16px -10px rgba(27,26,71,.3);opacity:0;pointer-events:none}
+.bubble.show{animation:bub 1.3s var(--spring) forwards}
+@keyframes bub{0%{opacity:0;transform:scale(.5)}18%{opacity:1;transform:scale(1)}75%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
+
+.fp{position:absolute;color:var(--lav2);pointer-events:none;animation:drift 9s ease-in-out infinite}
+.fp1{left:12%;top:24%;width:34px}.fp2{right:14%;top:42%;width:26px;animation-delay:-3s}
+.fp3{left:20%;bottom:20%;width:22px;animation-delay:-5s}.fp4{right:22%;bottom:14%;width:38px;animation-delay:-2s}
+@keyframes drift{0%,100%{transform:translateY(0) rotate(-12deg)}50%{transform:translateY(-10px) rotate(8deg)}}
+
+.hero h1{margin-top:clamp(22px,4vh,40px);font:800 clamp(3.4rem,11vw,7.4rem)/.92 var(--head);letter-spacing:-.055em;color:var(--purple)}
+.hero .tag{margin-top:clamp(10px,2vh,18px);font:700 clamp(1.15rem,2.6vw,1.7rem)/1.2 var(--head);letter-spacing:-.02em}
+.hero .sub{margin-top:8px;color:var(--muted)}
+.hero .btn{margin-top:clamp(22px,4vh,34px)}
+.scroll{position:absolute;left:50%;bottom:clamp(14px,3vh,26px);translate:-50% 0;width:46px;height:46px;display:grid;place-items:center;border-radius:50%;border:1.5px solid rgba(27,26,71,.2);color:var(--ink);text-decoration:none;transition:color .2s,background .2s,border-color .2s}
+.scroll svg{width:20px;height:20px;animation:nudge 1.8s ease-in-out infinite}
+.scroll:hover{background:var(--purple);border-color:var(--purple);color:var(--white)}
+@keyframes nudge{0%,100%{transform:translateY(-3px)}50%{transform:translateY(4px)}}
+
+/* ===== SECTIONS ===== */
+.section{max-width:1180px;margin:0 auto;padding:clamp(64px,9vw,112px) var(--pad) 0}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:clamp(24px,4vw,44px)}
+.head h2{font:800 clamp(1.9rem,4vw,3rem)/1.05 var(--head);letter-spacing:-.035em}
+.head p{margin-top:10px;color:var(--muted)}
+
+/* rules */
+.rules{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,2vw,24px)}
+.rule{background:var(--white);border:1px solid var(--line);border-radius:28px;padding:clamp(16px,2vw,24px);box-shadow:0 12px 36px -20px rgba(27,26,71,.14)}
+.art{height:112px;border-radius:20px;background:var(--lav);margin-bottom:18px;display:grid;place-items:center;overflow:hidden}
+.art svg{width:100%;height:100%}
+.rule h3{font:800 1.25rem/1.2 var(--head);letter-spacing:-.03em}
+.rule p{margin-top:8px;color:var(--muted);font-size:.96rem}
+.n{font:800 13px var(--head);fill:var(--purple);text-anchor:middle;animation:numpulse 3s ease-in-out infinite}
+.t{fill:var(--white);stroke:var(--lav2);stroke-width:1.5;animation:tile 3s ease-in-out infinite}
+@keyframes numpulse{0%,100%{opacity:.5}20%{opacity:1}}
+@keyframes tile{0%,100%{fill:#fff}20%{fill:#fff4d6}}
+.a1{transform-box:fill-box;animation:slide 3.6s ease-in-out infinite}
+@keyframes slide{0%,15%{transform:translateX(0)}45%,80%{transform:translateX(26px)}100%{transform:translateX(0)}}
+.nox{transform-box:fill-box;transform-origin:center;animation:nox 2.4s ease-in-out infinite}
+@keyframes nox{0%,100%{transform:scale(.8);opacity:.5}50%{transform:scale(1.15);opacity:1}}
+
+/* screenshots */
+.nav{display:flex;gap:8px}
+.nav button{width:44px;height:44px;border-radius:50%;border:1.5px solid rgba(27,26,71,.2);background:var(--white);color:var(--ink);display:grid;place-items:center;cursor:pointer;transition:background .2s,color .2s}
+.nav button:hover{background:var(--purple);color:var(--white);border-color:var(--purple)}
+.nav svg{width:18px;height:18px}
+.strip{display:flex;gap:clamp(12px,1.6vw,20px);overflow-x:auto;scroll-snap-type:x mandatory;padding:44px 6px 28px;margin:-44px -6px 0;scrollbar-width:none}
+.strip::-webkit-scrollbar{display:none}
+.frame{position:relative;flex:none;width:clamp(188px,22vw,248px);scroll-snap-align:start;transition:transform .4s var(--spring)}
+.frame img{position:relative;z-index:1;width:100%;height:auto;aspect-ratio:290/515;object-fit:cover;border-radius:22px;box-shadow:0 22px 34px -20px rgba(91,53,168,.45);background:var(--lav)}
+.frame:hover{transform:translateY(-6px) rotate(var(--r,-1.5deg))}
+.peekcat{position:absolute;z-index:0;left:50%;top:-27px;width:58px;margin-left:-29px;transform:translateY(60%);transition:transform .8s var(--spring) .3s}
+.frame.in .peekcat{transform:translateY(0)}
+
+/* closing */
+.close{margin:clamp(64px,9vw,112px) auto 0;max-width:1180px;padding:0 var(--pad)}
+.close-in{background:var(--lav);border-radius:36px;padding:clamp(36px,6vw,72px) var(--pad);text-align:center}
+.close h2{font:800 clamp(2rem,5vw,3.6rem)/1.02 var(--head);letter-spacing:-.04em;text-wrap:balance}
+.close p{margin:12px auto 0;color:var(--muted);max-width:36ch;text-wrap:balance}
+.close .btn{margin-top:26px}
+
+/* ===== FOOTER ===== */
+.footer{margin-top:clamp(64px,9vw,112px);background:var(--ink);color:var(--white);padding:clamp(28px,4vw,48px) var(--pad) 0}
+.f-top{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.f-brand{display:flex;align-items:center;gap:16px;text-decoration:none}
+.badge{position:relative;flex:none;width:72px;height:72px;border-radius:50%;background:var(--bg);display:grid;place-items:center}
+.badge svg{width:52px;transform:rotate(-6deg)}
+.lid{fill:#FC1F8F;transform-box:fill-box;transform-origin:50% 0;transition:transform .45s ease}
+.arc{stroke:#1B1A47;stroke-width:5;fill:none;stroke-linecap:round;transition:opacity .3s}
+.f-brand:hover .lid,.f-brand:focus-visible .lid{transform:scaleY(0)}
+.f-brand:hover .arc,.f-brand:focus-visible .arc{opacity:0}
+.zz{position:absolute;left:52px;top:-8px;font:800 .8rem/1 var(--head);color:rgba(255,255,255,.8);animation:zz 2.6s ease-in-out infinite}
+.f-brand:hover .zz{display:none}
+@keyframes zz{0%,100%{transform:translate(0,0);opacity:.9}50%{transform:translate(6px,-8px);opacity:.4}}
+.f-brand strong{display:block;font:800 1.15rem/1.2 var(--head);letter-spacing:-.02em}
+.f-brand span span{display:block;font-size:.9rem;color:rgba(255,255,255,.65)}
+.f-link{font:700 .92rem var(--head);text-decoration:none;color:rgba(255,255,255,.8);border-bottom:1.5px solid rgba(255,255,255,.3);padding-bottom:2px;transition:color .2s,border-color .2s}
+.f-link:hover{color:var(--white);border-color:var(--pink)}
+.f-bottom{margin:clamp(40px,6vw,72px) calc(-1*var(--pad)) 0;padding:20px var(--pad) clamp(20px,2.6vw,32px);border-top:1px solid rgba(255,255,255,.14);display:flex;justify-content:space-between;align-items:flex-end;gap:8px 24px;flex-wrap:wrap;font-size:.8rem;color:rgba(255,255,255,.6)}
+.f-bottom .made{margin-left:auto;text-align:right}
+
+/* ===== PAW TRAIL ===== */
+#trail{position:fixed;inset:0;pointer-events:none;z-index:50}
+.tp{position:absolute;width:22px;height:22px;color:#9B7BDB;opacity:0}
+.tp.go{animation:pawfade 1.7s ease-out forwards}
+@keyframes pawfade{0%{opacity:0;transform:rotate(var(--a)) scale(.5)}12%{opacity:.55;transform:rotate(var(--a)) scale(1)}100%{opacity:0;transform:rotate(var(--a)) scale(1)}}
+
+/* ===== REVEAL ===== */
+.js .rv{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .8s var(--spring);transition-delay:var(--d,0s)}
+.js .rv.in{opacity:1;transform:none}
+.js .frame.rv.in:hover{transform:translateY(-6px) rotate(var(--r,-1.5deg))}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width:860px){
+  .rules{grid-template-columns:1fr}
+  .rule{display:grid;grid-template-columns:150px 1fr;gap:0 18px;align-items:center}
+  .rule .art{grid-row:1 / span 2;margin:0;height:100px}
+  .rule p{margin-top:4px}
+  .nav{display:none}
+  .fp1,.fp3{left:5%}.fp2,.fp4{right:5%}
+}
+@media (max-width:480px){
+  .rule{grid-template-columns:112px 1fr}
+  .bubble{right:-8%}
+  .f-bottom{flex-direction:column;align-items:flex-start}
+  .f-bottom .made{margin-left:0;align-self:flex-end}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .js .rv{opacity:1;transform:none}
+  .peekcat{transform:none}
+}
+</style>
+</head>
+<body>
+
+<!-- shared drawings -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="cat" viewBox="0 0 40 40"><polygon points="5,18 8,3 20,11" fill="#2B2630"/><polygon points="35,18 32,3 20,11" fill="#2B2630"/><polygon points="8.5,14 9.5,7.5 14,10.5" fill="#E8776F"/><polygon points="31.5,14 30.5,7.5 26,10.5" fill="#E8776F"/><circle cx="20" cy="23" r="15" fill="#2B2630"/><circle cx="13.8" cy="22" r="4.6" fill="#F5C518"/><circle cx="26.2" cy="22" r="4.6" fill="#F5C518"/><circle cx="14.4" cy="22.2" r="2.2" fill="#111"/><circle cx="25.6" cy="22.2" r="2.2" fill="#111"/><circle cx="20" cy="28" r="1.3" fill="#E8776F"/></symbol>
+  <symbol id="box" viewBox="0 0 40 40"><rect x="3" y="10" width="34" height="26" rx="5" fill="#E3A455"/><rect x="3" y="10" width="34" height="8" rx="4" fill="#C98B3C"/><circle cx="20" cy="29" r="4" fill="#B7792F"/><circle cx="14.5" cy="24.3" r="1.7" fill="#B7792F"/><circle cx="20" cy="22.6" r="1.7" fill="#B7792F"/><circle cx="25.5" cy="24.3" r="1.7" fill="#B7792F"/></symbol>
+  <symbol id="paw" viewBox="0 0 24 24"><ellipse cx="12" cy="16" rx="5.6" ry="4.6" fill="currentColor"/><ellipse cx="5" cy="10.5" rx="2.2" ry="2.9" fill="currentColor" transform="rotate(-18 5 10.5)"/><ellipse cx="9.5" cy="6" rx="2.3" ry="3" fill="currentColor" transform="rotate(-6 9.5 6)"/><ellipse cx="14.5" cy="6" rx="2.3" ry="3" fill="currentColor" transform="rotate(6 14.5 6)"/><ellipse cx="19" cy="10.5" rx="2.2" ry="2.9" fill="currentColor" transform="rotate(18 19 10.5)"/></symbol>
+  <symbol id="gplay" viewBox="0 0 24 24"><path fill="currentColor" d="M3.6 1.8c-.3.3-.5.8-.5 1.4v17.6c0 .6.2 1.1.5 1.4l.1.1L13.6 12v-.2L3.7 1.7l-.1.1zm13.6 6.9L13.9 12l3.3 3.3 3.9-2.2c1.1-.6 1.1-1.7 0-2.3l-3.9-2.1zM14 12.3 3.7 22.6c.4.4 1 .4 1.7.1l11.8-6.7L14 12.3zM5.4 1.4c-.7-.3-1.3-.3-1.7.1L14 11.7l3.2-3.3L5.4 1.4z"/></symbol>
+</defs></svg>
+
+<div id="trail" aria-hidden="true"></div>
+
+<!-- ===== HERO ===== -->
+<header class="hero">
+  <a class="from" href="/" aria-label="Maadi Labs home"><b>maadi<i>labs</i></b><em>presents</em></a>
+
+  <button class="cat" id="catBtn" type="button" aria-label="Tap the cat">
+    <span class="bubble" id="bubble" aria-hidden="true"></span>
+    <svg class="spark" viewBox="0 0 60 60" aria-hidden="true"><path d="M12 48 20 28M28 40 42 24M38 52 52 46" stroke="#FFC933" stroke-width="7" stroke-linecap="round" fill="none"/></svg>
+    <span class="cat-in" id="catIn"><img src="mewmew-icon.png" alt="Mew Mew: a black kitten peeking out of a cardboard box" width="512" height="512"></span>
+  </button>
+
+  <svg class="fp fp1" aria-hidden="true"><use href="#paw"/></svg><svg class="fp fp2" aria-hidden="true"><use href="#paw"/></svg>
+  <svg class="fp fp3" aria-hidden="true"><use href="#paw"/></svg><svg class="fp fp4" aria-hidden="true"><use href="#paw"/></svg>
+
+  <h1>Mew Mew</h1>
+  <p class="tag">A purrfect logic puzzle</p>
+  <p class="sub">Find every kitty a box.</p>
+  <!-- Becomes a real link once PLAY_URL is set in the script below -->
+  <a class="btn play" href="#" aria-disabled="true"><svg aria-hidden="true"><use href="#gplay"/></svg><span>Coming to Google Play</span></a>
+
+  <a class="scroll" href="#rules" aria-label="Scroll down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg></a>
+</header>
+
+<main>
+<!-- ===== RULES ===== -->
+<section class="section" id="rules" aria-labelledby="rules-t">
+  <div class="head"><div><h2 id="rules-t">Three little rules</h2><p>Easy to learn. Purrfectly tricky to master.</p></div></div>
+  <div class="rules">
+    <article class="rule rv">
+      <div class="art"><svg viewBox="0 0 140 80" aria-hidden="true"><use href="#box" x="82" y="18" width="46" height="46"/><use class="a1" href="#cat" x="14" y="16" width="46" height="46"/></svg></div>
+      <h3>Find every kitty a box</h3><p>Place cats next to a box, horizontally or vertically.</p>
+    </article>
+    <article class="rule rv" style="--d:.1s">
+      <div class="art"><svg viewBox="0 0 140 80" aria-hidden="true">
+        <g><rect class="t" x="8" y="26" width="22" height="26" rx="7"/><text class="n" x="19" y="44">2</text></g>
+        <g><rect class="t" x="34" y="26" width="22" height="26" rx="7" style="animation-delay:.5s"/><text class="n" x="45" y="44" style="animation-delay:.5s">1</text></g>
+        <g><rect class="t" x="60" y="26" width="22" height="26" rx="7" style="animation-delay:1s"/><text class="n" x="71" y="44" style="animation-delay:1s">1</text></g>
+        <g><rect class="t" x="86" y="26" width="22" height="26" rx="7" style="animation-delay:1.5s"/><text class="n" x="97" y="44" style="animation-delay:1.5s">2</text></g>
+        <g><rect class="t" x="112" y="26" width="22" height="26" rx="7" style="animation-delay:2s"/><text class="n" x="123" y="44" style="animation-delay:2s">1</text></g></svg></div>
+      <h3>Numbers hold the clue</h3><p>Match the numbers in each row and column.</p>
+    </article>
+    <article class="rule rv" style="--d:.2s">
+      <div class="art"><svg viewBox="0 0 140 80" aria-hidden="true"><use href="#cat" x="14" y="18" width="42" height="42"/><use href="#cat" x="84" y="18" width="42" height="42"/><g class="nox"><circle cx="70" cy="39" r="13" fill="#FFE3EE"/><path d="M64 33l12 12M76 33 64 45" stroke="#E8517F" stroke-width="4" stroke-linecap="round"/></g></svg></div>
+      <h3>No two kitties can touch</h3><p>Keep at least one space between cats, even diagonally.</p>
+    </article>
+  </div>
+</section>
+
+<!-- ===== SCREENS ===== -->
+<section class="section" aria-labelledby="peek-t">
+  <div class="head">
+    <div><h2 id="peek-t">A peek inside</h2><p>Soft, cosy and a little bit clever.</p></div>
+    <div class="nav"><button type="button" id="prev" aria-label="Previous screenshots"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><button type="button" id="next" aria-label="Next screenshots"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button></div>
+  </div>
+  <div class="strip" id="strip" tabindex="0" aria-label="Mew Mew screenshots">
+    <figure class="frame rv" style="margin:0;--r:-2deg"><img src="screen-1.png" alt="Mew Mew title screen: a purrfect logic puzzle" width="290" height="515" loading="lazy"></figure>
+    <figure class="frame rv" style="margin:0;--d:.08s;--r:1.5deg"><img src="screen-2.png" alt="Find every kitty a box" width="290" height="515" loading="lazy"></figure>
+    <figure class="frame rv" style="margin:0;--d:.16s;--r:-1.5deg"><svg class="peekcat" viewBox="0 0 40 40" aria-hidden="true"><use href="#cat"/></svg><img src="screen-3.png" alt="Numbers hold the clue" width="290" height="515" loading="lazy"></figure>
+    <figure class="frame rv" style="margin:0;--d:.24s;--r:2deg"><img src="screen-4.png" alt="No two kitties can touch" width="290" height="515" loading="lazy"></figure>
+    <figure class="frame rv" style="margin:0;--d:.32s;--r:-1.5deg"><img src="screen-5.png" alt="Can you solve them all? Hundreds of handcrafted puzzles" width="290" height="515" loading="lazy"></figure>
+  </div>
+</section>
+
+<!-- ===== CLOSING ===== -->
+<section class="close" aria-labelledby="close-t">
+  <div class="close-in rv">
+    <h2 id="close-t">Can you solve them all?</h2>
+    <p>Hundreds of handcrafted puzzles, from easy to tricky.</p>
+    <a class="btn play" href="#" aria-disabled="true"><svg aria-hidden="true"><use href="#gplay"/></svg><span>Coming to Google Play</span></a>
+  </div>
+</section>
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <div class="f-top">
+    <a class="f-brand" href="/" aria-label="A Maadi Labs game. Visit the studio">
+      <span class="badge">
+        <svg viewBox="63 111 503 369" aria-hidden="true">
+          <g transform="translate(0.000000,600.000000) scale(0.100000,-0.100000)" fill="#FC1F8F" stroke="none">
+            <path d="M4275 4732 c-72 -35 -99 -76 -289 -444 -69 -134 -96 -197 -96 -223 0 -40 22 -100 48 -128 70 -78 226 -75 298 5 35 38 314 540 323 580 17 72 -17 153 -80 195 -55 36 -145 42 -204 15z"/>
+            <path d="M4985 4291 c-49 -12 -74 -29 -208 -139 -235 -193 -348 -293 -367 -325 -28 -45 -27 -127 2 -179 50 -89 170 -119 258 -65 25 14 151 106 280 204 260 197 280 219 280 309 0 126 -124 225 -245 195z"/>
+            <path d="M1958 3850 c-318 -39 -625 -280 -866 -680 -231 -382 -350 -816 -313 -1141 39 -333 219 -569 511 -669 50 -17 97 -23 200 -27 165 -6 267 14 406 82 164 79 281 179 507 432 174 195 287 272 411 281 88 7 156 -13 240 -69 74 -49 113 -90 267 -279 144 -176 264 -278 416 -354 124 -62 193 -78 353 -83 179 -6 276 13 420 84 80 40 109 61 185 137 74 74 99 107 132 176 56 114 73 183 80 320 15 318 -136 833 -344 1170 -117 190 -294 387 -426 474 -232 152 -487 190 -718 106 -154 -56 -272 -155 -386 -326 -100 -148 -161 -186 -243 -149 -52 23 -87 63 -150 170 -99 168 -246 288 -401 329 -73 19 -200 26 -281 16z m676 -844 c63 -48 66 -60 66 -301 0 -237 -3 -250 -60 -299 -81 -68 -208 -49 -261 38 -17 28 -19 53 -19 257 0 219 1 227 23 260 55 82 175 104 251 45z m634 7 c15 -11 37 -35 50 -53 21 -32 22 -41 22 -252 0 -198 -2 -222 -20 -257 -34 -68 -123 -105 -195 -81 -52 17 -103 65 -115 108 -16 58 -13 416 4 456 16 39 50 73 91 92 41 20 129 13 163 -13z"/>
+            <path d="M5205 3565 c-60 -14 -177 -39 -259 -56 -126 -28 -154 -37 -183 -62 -46 -40 -63 -77 -63 -134 0 -95 75 -172 168 -173 64 0 518 78 550 94 31 16 74 61 91 93 18 35 13 119 -9 163 -23 45 -85 85 -145 93 -24 4 -83 -4 -150 -18z"/>
+          </g>
+          <rect x="243" y="309.4" width="20" height="40" rx="10" fill="#1B1A47"/><rect x="307.5" y="310.2" width="20" height="40" rx="10" fill="#1B1A47"/>
+          <rect class="lid" x="233" y="296" width="40" height="66" rx="19"/><rect class="lid" x="297.5" y="297" width="40" height="66" rx="19"/>
+          <path class="arc" d="M241 331q12 9 24 0"/><path class="arc" d="M305.5 332q12 9 24 0"/>
+        </svg>
+        <span class="zz" aria-hidden="true">zzz</span>
+      </span>
+      <span><strong>A Maadi Labs game</strong><span>Small games. Big moments.</span></span>
+    </a>
+    <a class="f-link" href="/">More from Maadi Labs</a>
+  </div>
+  <div class="f-bottom">
+    <span>© 2026 Maadi Labs. Made with a little extra joy.</span>
+    <span class="made">Proudly made in India 🇮🇳</span>
+  </div>
+</footer>
+
+<script>
+/* ---- EDIT HERE once the Google Play listing is live ---- */
+var PLAY_URL = "";   // e.g. "https://play.google.com/store/apps/details?id=..."
+
+(function(){
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* Play buttons: "coming" until PLAY_URL is set */
+  Array.prototype.forEach.call(document.querySelectorAll('.play'), function(a){
+    if (PLAY_URL){ a.href = PLAY_URL; a.target = '_blank'; a.rel = 'noopener'; a.removeAttribute('aria-disabled'); a.querySelector('span').textContent = 'Get it on Google Play'; }
+    else a.addEventListener('click', function(e){ e.preventDefault(); });
+  });
+
+  /* reveal on scroll */
+  var rv = document.querySelectorAll('.rv');
+  if ('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(es){ es.forEach(function(e){ if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } }); }, {threshold:.25});
+    Array.prototype.forEach.call(rv, function(el){ io.observe(el); });
+  } else Array.prototype.forEach.call(rv, function(el){ el.classList.add('in'); });
+
+  /* cat: tilt toward the pointer, hop + "mew!" on tap */
+  var cat = document.getElementById('catBtn'), inner = document.getElementById('catIn'), bub = document.getElementById('bubble'), q = false, mx = 0, my = 0;
+  function tilt(){ q = false; var r = cat.getBoundingClientRect(), nx = (mx - (r.left + r.width/2)) / innerWidth, ny = (my - (r.top + r.height/2)) / innerHeight;
+    inner.style.setProperty('--ry', Math.max(-12, Math.min(12, nx * 30)).toFixed(1) + 'deg'); inner.style.setProperty('--rx', Math.max(-10, Math.min(10, -ny * 26)).toFixed(1) + 'deg'); }
+  if (!reduce) document.addEventListener('pointermove', function(e){ mx = e.clientX; my = e.clientY; if (!q){ q = true; requestAnimationFrame(tilt); } });
+  var says = ['mew!', 'mew mew!', 'prrr…', 'meow?', 'mrrp!'], k = 0;
+  cat.addEventListener('click', function(){
+    cat.classList.remove('hop'); bub.classList.remove('show'); void cat.offsetWidth;
+    cat.classList.add('hop'); bub.textContent = says[k++ % says.length]; bub.classList.add('show');
+    setTimeout(function(){ cat.classList.remove('hop'); }, 650);
+  });
+
+  /* paw-print trail */
+  var trail = document.getElementById('trail'), N = 14, paws = [], idx = 0, side = 1, lx = -999, ly = -999;
+  if (!reduce){
+    for (var i = 0; i < N; i++){ var s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); s.setAttribute('class', 'tp'); s.innerHTML = '<use href="#paw"/>'; trail.appendChild(s); paws.push(s); }
+    document.addEventListener('pointermove', function(e){
+      var dx = e.clientX - lx, dy = e.clientY - ly, d = Math.hypot(dx, dy);
+      if (d < 56) return;
+      var a = Math.atan2(dy, dx), p = paws[idx++ % N];
+      p.style.left = (e.clientX - Math.sin(a) * 9 * side - 11) + 'px'; p.style.top = (e.clientY + Math.cos(a) * 9 * side - 11) + 'px';
+      p.style.setProperty('--a', (a * 180 / Math.PI + 90) + 'deg'); side = -side;
+      p.classList.remove('go'); void p.getBoundingClientRect(); p.classList.add('go'); lx = e.clientX; ly = e.clientY;
+    });
+  }
+
+  /* screenshot strip buttons */
+  var strip = document.getElementById('strip');
+  document.getElementById('prev').addEventListener('click', function(){ strip.scrollBy({left: -strip.clientWidth * .8, behavior: 'smooth'}); });
+  document.getElementById('next').addEventListener('click', function(){ strip.scrollBy({left: strip.clientWidth * .8, behavior: 'smooth'}); });
+})();
+</script>
+</body>
+</html>
